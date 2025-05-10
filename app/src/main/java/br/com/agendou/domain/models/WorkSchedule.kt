@@ -3,10 +3,12 @@ package br.com.agendou.domain.models
 import br.com.agendou.domain.enums.DayOfWeek
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
 data class WorkSchedule(
+    @get:Exclude
     var id: String = "",
     var professionalRef: DocumentReference? = null,
     var dayOfWeek: DayOfWeek = DayOfWeek.MONDAY,
