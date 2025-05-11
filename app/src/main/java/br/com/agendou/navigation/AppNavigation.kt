@@ -19,6 +19,7 @@ import br.com.agendou.ui.auth.LoginScreen
 import br.com.agendou.ui.auth.SignUpScreen
 import br.com.agendou.ui.booking.BookingScreen
 import br.com.agendou.ui.category.CategoryListScreen
+import br.com.agendou.ui.client.HomeClientScreen
 import br.com.agendou.ui.evaluation.EvaluationScreen
 import br.com.agendou.ui.onboarding.ProfileOnboardingScreen
 import br.com.agendou.ui.onboarding.UserType
@@ -197,14 +198,30 @@ fun AppNavigation(
                 }
             )
         ) { backStackEntry ->
-            // HomeClientScreen - aqui você usaria o Screen que já tem
             val categoryId = backStackEntry.arguments?.getString("categoryId")
-            // HomeClientScreen(
-            //    categoryId = categoryId,
-            //    onProfessionalClick = { professionalId ->
-            //        navController.navigate(Screen.ProfessionalDetail.createRoute(professionalId))
-            //    }
-            // )
+            HomeClientScreen(
+                onProfessionalClick = { professionalId ->
+                    navController.navigate(Screen.ProfessionalDetail.createRoute(professionalId))
+                },
+                onProfileClick = {
+                    navController.navigate(Screen.Profile.route)
+                },
+                onAppointmentsClick = {
+                    navController.navigate(Screen.MyAppointments.route)
+                },
+                onHistoryClick = {
+                    // Aqui poderia navegar para uma tela de histórico específica
+                    // ou talvez filtrar a tela de agendamentos
+                    navController.navigate(Screen.MyAppointments.route)
+                },
+                onLogoutClick = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
         
         composable(
