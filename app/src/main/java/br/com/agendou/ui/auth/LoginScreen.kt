@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,13 +43,14 @@ import br.com.agendou.R
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (isFirstLogin: Boolean, userType: String) -> Unit = { _, _ -> },
+    onLoginSuccess: (isFirstLogin: Boolean, userType: String, rememberMe: Boolean, email: String, password: String) -> Unit = { _, _, _, _, _ -> },
     onSignUpClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var rememberMe by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -102,16 +104,31 @@ fun LoginScreen(
             }
         )
         
-        Spacer(Modifier.height(8.dp))
-        
-        TextButton(
-            onClick = onForgotPasswordClick,
-            modifier = Modifier.align(Alignment.End)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Esqueceu a senha?")
+            Checkbox(
+                checked = rememberMe,
+                onCheckedChange = { rememberMe = it }
+            )
+            
+            Text(
+                "Lembrar-me",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            Spacer(Modifier.weight(1f))
+            
+            TextButton(
+                onClick = onForgotPasswordClick
+            ) {
+                Text("Esqueceu a senha?")
+            }
         }
         
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(16.dp))
 
         Button(
             onClick = { 
@@ -122,7 +139,7 @@ fun LoginScreen(
                     // Determina o tipo de usuário (simulado)
                     val userType = if (email.contains("pro")) "PROFESSIONAL" else "CLIENT"
                     
-                    onLoginSuccess(isFirstLogin, userType)
+                    onLoginSuccess(isFirstLogin, userType, rememberMe, email, password)
                 }
             },
             modifier = Modifier

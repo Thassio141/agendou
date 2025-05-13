@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -13,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import br.com.agendou.data.preferences.UserPreferences
 import br.com.agendou.ui.appointments.MyAppointmentsScreen
 import br.com.agendou.ui.auth.ForgotPasswordScreen
 import br.com.agendou.ui.auth.LoginScreen
@@ -94,23 +96,48 @@ fun AppNavigation(
                             inclusive = true
                         }
                     }
+                },
+                onAutoLogin = { email, password ->
+                    // Simula um login automático com credenciais salvas
+                    val isFirstLogin = email.contains("novo")
+                    val userType = if (email.contains("pro")) "PROFESSIONAL" else "CLIENT"
+                    
+                    // Navega diretamente para a tela apropriada
+                    when {
+                        userType == "CLIENT" -> {
+                            navController.navigate(Screen.HomeClient.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                        userType == "PROFESSIONAL" -> {
+                            navController.navigate(Screen.DashboardPro.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
                 }
             )
             
-            // Simula a navegação automática após 2 segundos
-            LaunchedEffect(key1 = true) {
-                delay(2000)
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        inclusive = true
-                    }
-                }
-            }
+            // Nota: Removemos a navegação automática para permitir o auto-login
         }
         
         composable(Screen.Login.route) {
+            val context = LocalContext.current
+            val userPreferences = remember { UserPreferences(context) }
+            
             LoginScreen(
-                onLoginSuccess = { isFirstLogin, userType ->
+                onLoginSuccess = { isFirstLogin, userType, rememberMe, email, password ->
+                    // Se lembrar-me estiver marcado, salva as credenciais
+                    if (rememberMe) {
+                        userPreferences.saveLoginCredentials(email, password)
+                    } else {
+                        userPreferences.clearLoginCredentials()
+                    }
+                    
                     when {
                         isFirstLogin -> {
                             navController.navigate(Screen.Onboarding.route) {
@@ -221,6 +248,11 @@ fun AppNavigation(
                     navController.navigate(Screen.MyAppointments.route)
                 },
                 onLogoutClick = {
+                    // Limpa as credenciais salvas ao fazer logout
+                    val context = navController.context
+                    val userPreferences = UserPreferences(context)
+                    userPreferences.clearLoginCredentials()
+                    
                     navController.navigate(Screen.Login.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             inclusive = true
@@ -319,6 +351,11 @@ fun AppNavigation(
                     navController.navigate(Screen.Profile.route)
                 },
                 onLogoutClick = {
+                    // Limpa as credenciais salvas ao fazer logout
+                    val context = navController.context
+                    val userPreferences = UserPreferences(context)
+                    userPreferences.clearLoginCredentials()
+                    
                     navController.navigate(Screen.Login.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             inclusive = true

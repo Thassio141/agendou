@@ -21,16 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.agendou.R
+import br.com.agendou.data.preferences.UserPreferences
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToLogin: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {},
+    onAutoLogin: (email: String, password: String) -> Unit = { _, _ -> }
 ) {
+    val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
+    
     val infiniteTransition = rememberInfiniteTransition(label = "splash_alpha")
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
@@ -42,7 +48,14 @@ fun SplashScreen(
 
     LaunchedEffect(key1 = true) {
         delay(2000)
-        onNavigateToLogin()
+        
+        if (userPreferences.hasCredentials()) {
+            val email = userPreferences.getEmail()
+            val password = userPreferences.getPassword()
+            onAutoLogin(email, password)
+        } else {
+            onNavigateToLogin()
+        }
     }
 
     Box(
