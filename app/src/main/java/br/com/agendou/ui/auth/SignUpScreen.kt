@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +38,8 @@ import br.com.agendou.R
 
 @Composable
 fun SignUpScreen(
-    onSignUpClick: (email: String, password: String, confirmPassword: String) -> Unit = { _, _, _ -> }
+    onSignUpClick: (email: String, password: String, confirmPassword: String) -> Unit = { _, _, _ -> },
+    onBackToLoginClick: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -144,6 +146,15 @@ fun SignUpScreen(
             enabled = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && passwordsMatch
         ) {
             Text("Criar Conta", style = MaterialTheme.typography.labelLarge)
+        }
+        
+        Spacer(Modifier.height(16.dp))
+        
+        TextButton(
+            onClick = onBackToLoginClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Voltar para Login", style = MaterialTheme.typography.labelLarge)
         }
     }
 }

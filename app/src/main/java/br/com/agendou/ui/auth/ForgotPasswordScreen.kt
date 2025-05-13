@@ -14,6 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,8 @@ import br.com.agendou.R
 
 @Composable
 fun ForgotPasswordScreen(
-    onSendLinkClick: (email: String) -> Unit = { _ -> }
+    onSendLinkClick: (email: String) -> Unit = { _ -> },
+    onBackToLoginClick: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
 
@@ -92,6 +94,15 @@ fun ForgotPasswordScreen(
             enabled = email.isNotEmpty()
         ) {
             Text("Enviar Link de Recuperação", style = MaterialTheme.typography.labelLarge)
+        }
+        
+        Spacer(Modifier.height(16.dp))
+        
+        TextButton(
+            onClick = onBackToLoginClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Voltar para Login", style = MaterialTheme.typography.labelLarge)
         }
     }
 }

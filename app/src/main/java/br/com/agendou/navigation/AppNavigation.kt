@@ -145,6 +145,9 @@ fun AppNavigation(
                     navController.navigate(Screen.Onboarding.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                onBackToLoginClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -155,6 +158,9 @@ fun AppNavigation(
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("Link enviado para $email")
                     }
+                },
+                onBackToLoginClick = {
+                    navController.popBackStack()
                 }
             )
         }
