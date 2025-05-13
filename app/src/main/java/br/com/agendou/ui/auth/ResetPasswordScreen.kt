@@ -31,22 +31,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.agendou.R
 
 @Composable
-fun SignUpScreen(
-    onSignUpClick: (name: String, email: String, password: String, confirmPassword: String) -> Unit = { _, _, _, _ -> },
-    onBackToLoginClick: () -> Unit = {}
+fun ResetPasswordScreen(
+    onResetPasswordClick: (newPassword: String) -> Unit = { _ -> },
+    onBackClick: () -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
@@ -68,51 +66,33 @@ fun SignUpScreen(
         Spacer(Modifier.height(24.dp))
         
         Text(
-            "Criar Conta",
+            "Redefinir Senha",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary
         )
         
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(16.dp))
+        
+        Text(
+            "Crie uma nova senha segura para sua conta.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        
+        Spacer(Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nome") },
+            value = newPassword,
+            onValueChange = { 
+                newPassword = it
+                passwordsMatch = newPassword == confirmPassword || confirmPassword.isEmpty()
+            },
+            label = { Text("Nova senha") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                keyboardType = KeyboardType.Text
-            )
-        )
-        
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("E-mail") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
-        
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { 
-                password = it
-                passwordsMatch = password == confirmPassword || confirmPassword.isEmpty()
-            },
-            label = { Text("Senha") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -127,19 +107,18 @@ fun SignUpScreen(
             value = confirmPassword,
             onValueChange = { 
                 confirmPassword = it
-                passwordsMatch = password == confirmPassword || confirmPassword.isEmpty()
+                passwordsMatch = newPassword == confirmPassword || confirmPassword.isEmpty()
             },
-            label = { Text("Confirmar Senha") },
-            modifier = Modifier
-                .fillMaxWidth(),
+            label = { Text("Confirmar nova senha") },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = !passwordsMatch,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             supportingText = {
                 if (!passwordsMatch) {
                     Text("As senhas não correspondem", color = MaterialTheme.colorScheme.error)
                 }
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (confirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
@@ -152,7 +131,7 @@ fun SignUpScreen(
         Spacer(Modifier.height(32.dp))
 
         Button(
-            onClick = { onSignUpClick(name, email, password, confirmPassword) },
+            onClick = { onResetPasswordClick(newPassword) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -161,24 +140,24 @@ fun SignUpScreen(
                 containerColor = Color(0xFF113354),
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
-            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && passwordsMatch
+            enabled = newPassword.isNotEmpty() && confirmPassword.isNotEmpty() && passwordsMatch
         ) {
-            Text("Criar Conta", style = MaterialTheme.typography.labelLarge)
+            Text("Confirmar Nova Senha", style = MaterialTheme.typography.labelLarge)
         }
         
         Spacer(Modifier.height(16.dp))
         
         TextButton(
-            onClick = onBackToLoginClick,
+            onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Voltar para Login", style = MaterialTheme.typography.labelLarge)
+            Text("Voltar", style = MaterialTheme.typography.labelLarge)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreenPreview() {
-    SignUpScreen()
+fun ResetPasswordScreenPreview() {
+    ResetPasswordScreen()
 } 

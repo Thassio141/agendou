@@ -2,7 +2,6 @@ package br.com.agendou.navigation
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -18,7 +17,9 @@ import br.com.agendou.data.preferences.UserPreferences
 import br.com.agendou.ui.appointments.MyAppointmentsScreen
 import br.com.agendou.ui.auth.ForgotPasswordScreen
 import br.com.agendou.ui.auth.LoginScreen
+import br.com.agendou.ui.auth.ResetPasswordScreen
 import br.com.agendou.ui.auth.SignUpScreen
+import br.com.agendou.ui.auth.VerificationCodeScreen
 import br.com.agendou.ui.booking.BookingScreen
 import br.com.agendou.ui.category.CategoryListScreen
 import br.com.agendou.ui.client.HomeClientScreen
@@ -31,7 +32,6 @@ import br.com.agendou.ui.professional.ScheduleManagementScreen
 import br.com.agendou.ui.professional.ServiceManagementScreen
 import br.com.agendou.ui.profile.ProfileScreen
 import br.com.agendou.ui.splash.SplashScreen
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
@@ -39,6 +39,12 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object SignUp : Screen("signup")
     object ForgotPassword : Screen("forgotPassword")
+    object VerificationCode : Screen("verificationCode/{email}") {
+        fun createRoute(email: String): String {
+            return "verificationCode/$email"
+        }
+    }
+    object ResetPassword : Screen("resetPassword")
     object Onboarding : Screen("onboarding")
     object CategoryList : Screen("categoryList")
     
@@ -99,7 +105,7 @@ fun AppNavigation(
                 },
                 onAutoLogin = { email, password ->
                     // Simula um login automático com credenciais salvas
-                    val isFirstLogin = email.contains("novo")
+                    email.contains("novo")
                     val userType = if (email.contains("pro")) "PROFESSIONAL" else "CLIENT"
                     
                     // Navega diretamente para a tela apropriada
@@ -167,7 +173,7 @@ fun AppNavigation(
         
         composable(Screen.SignUp.route) {
             SignUpScreen(
-                onSignUpClick = { email, password, confirmPassword ->
+                onSignUpClick = { name, email, password, confirmPassword ->
                     // Normalmente aqui faria a criação da conta
                     navController.navigate(Screen.Onboarding.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
@@ -182,11 +188,50 @@ fun AppNavigation(
         composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
                 onSendLinkClick = { email ->
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Link enviado para $email")
-                    }
+                    // Navega para a tela de verificação de código
+                    navController.navigate(Screen.VerificationCode.createRoute(email))
                 },
                 onBackToLoginClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(
+            route = Screen.VerificationCode.route,
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            VerificationCodeScreen(
+                email = email,
+                onVerifyCodeClick = { code ->
+                    navController.navigate(Screen.ResetPassword.route) {
+                        popUpTo(Screen.VerificationCode.route) { inclusive = true }
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(Screen.ResetPassword.route) {
+            ResetPasswordScreen(
+                onResetPasswordClick = { newPassword ->
+                    // Aqui você pode implementar a lógica para redefinir a senha
+                    // Para este exemplo, vamos apenas navegar de volta para a tela de login
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Senha redefinida com sucesso! Faça login com sua nova senha.")
+                    }
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onBackClick = {
                     navController.popBackStack()
                 }
             )
@@ -231,7 +276,7 @@ fun AppNavigation(
                 }
             )
         ) { backStackEntry ->
-            val categoryId = backStackEntry.arguments?.getString("categoryId")
+            backStackEntry.arguments?.getString("categoryId")
             HomeClientScreen(
                 onProfessionalClick = { professionalId ->
                     navController.navigate(Screen.ProfessionalDetail.createRoute(professionalId))
@@ -270,7 +315,6 @@ fun AppNavigation(
                 }
             )
         ) { backStackEntry ->
-            val professionalId = backStackEntry.arguments?.getString("professionalId") ?: "1"
             ProfessionalDetailScreen(
                 onBackClick = {
                     navController.popBackStack()
