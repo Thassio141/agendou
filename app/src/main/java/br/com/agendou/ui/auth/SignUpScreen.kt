@@ -76,8 +76,7 @@ fun SignUpScreen(
             onValueChange = { email = it },
             label = { Text("E-mail") },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+                .fillMaxWidth(),
             singleLine = true
         )
         
@@ -91,8 +90,7 @@ fun SignUpScreen(
             },
             label = { Text("Senha") },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+                .fillMaxWidth(),
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -113,8 +111,7 @@ fun SignUpScreen(
             },
             label = { Text("Confirmar Senha") },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+                .fillMaxWidth(),
             singleLine = true,
             isError = !passwordsMatch,
             supportingText = {
