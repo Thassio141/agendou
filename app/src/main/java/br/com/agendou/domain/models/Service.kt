@@ -1,15 +1,20 @@
 package br.com.agendou.domain.models
 
-import java.sql.Timestamp
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.IgnoreExtraProperties
 
-data class Service (
-    val id: String,
-    val idProfessional : String,
-    val duration: Int,
-    val name: String,
-    val description: String?= null,
-    val price: Double,
-    val active : Boolean = true,
-    val createdAt : Timestamp,
-    val updatedAt : Timestamp
+@IgnoreExtraProperties
+data class Service(
+    @get:Exclude
+    var id: String = "",
+    var professionalRef: DocumentReference? = null,
+    var duration: Int = 0,
+    var name: String = "",
+    var description: String? = null,
+    var price: Double = 0.0,
+    var active: Boolean = true,
+    var createdAt: Timestamp? = null,
+    var updatedAt: Timestamp? = null
 )

@@ -1,9 +1,13 @@
 package br.com.agendou.domain.models
 
-import java.sql.Timestamp
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.IgnoreExtraProperties
 
+@IgnoreExtraProperties
 data class Category(
-    val id: String,
-    val name: String,
-    val createdAt: Timestamp
+    @get:Exclude
+    var id: String = "",
+    var name: String = "",
+    var createdAt: Timestamp? = null
 )
