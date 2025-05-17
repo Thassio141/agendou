@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "br.com.agendou.HiltTestRunner"
     }
 
     buildTypes {
@@ -39,6 +39,17 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    
+    // Configuração para testes usando Compose
+    androidResources {
+        noCompress += listOf("dex", "so", "xml")
+    }
+    
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -70,4 +81,21 @@ dependencies {
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    // Testes unitários adicionais
+    testImplementation("org.mockito:mockito-core:5.9.0")
+    testImplementation("org.mockito:mockito-inline:5.9.0") // Para mock de classes finais
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1") // Mockito para Kotlin
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0") // Para testes de coroutines
+    testImplementation("io.mockk:mockk:1.13.9") // Alternativa ao Mockito para Kotlin
+
+    // Testes de Integração e de UI
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51")
+    androidTestImplementation("androidx.compose.ui:ui-test:1.6.3")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.3")
 }
